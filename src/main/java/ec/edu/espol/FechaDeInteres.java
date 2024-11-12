@@ -10,7 +10,7 @@ public class FechaDeInteres {
     LocalDate fecha;
     
     public static final String DATE_FORMAT = "dd/MM/yyyy";
-	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     
     public FechaDeInteres(String nombre, LocalDate fecha) {
         this.nombre = nombre;
@@ -18,12 +18,12 @@ public class FechaDeInteres {
     }
 
     public String getNombre() {
-		return nombre;
-	}
+        return nombre;
+    }
 
     public LocalDate getFecha() {
-		return fecha;
-	}
+        return fecha;
+    }
     
     public static FechaDeInteres next(Scanner scanner, String indentation) {
         System.out.print(indentation+"- nombre: ");
@@ -34,12 +34,12 @@ public class FechaDeInteres {
         
 
         LocalDate fecha;
-		try {
-			fecha = LocalDate.parse(fecha_string, DATE_FORMATTER);
-		} catch (DateTimeParseException e) {
-			fecha = LocalDate.now();
-			System.out.println(indentation+indentation+"LA FECHA NO ESTÁ EN EL FORMATO CORRECTO. Se usó la fecha actual.");
-		}
+        try {
+            fecha = LocalDate.parse(fecha_string, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            fecha = LocalDate.now();
+            System.out.println(indentation+indentation+"LA FECHA NO ESTÁ EN EL FORMATO CORRECTO. Se usó la fecha actual.");
+        }
         
         return new FechaDeInteres(nombre, fecha);
     }

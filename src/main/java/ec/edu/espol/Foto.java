@@ -10,15 +10,15 @@ public class Foto {
         this.path = path;
     }
 
-	public int[] getPixels() {
-		return pixels;
-	}
+    public int[] getPixels() {
+        return pixels;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public int getHeight() {
-		return height;
-	}
+    public int getHeight() {
+        return height;
+    }
 }

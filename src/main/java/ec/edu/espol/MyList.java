@@ -21,10 +21,11 @@ public class MyList<T> {
         this(DEFAULT_CAPACITY, false);
     }
 
-	public int size() {
-		return length;
-	}
+    public int size() {
+        return length;
+    }
     
+    @SuppressWarnings("unchecked")
     public T get(int i) {
         return (T)items[i];
     }
@@ -33,7 +34,7 @@ public class MyList<T> {
         items[i] = value;
     }
 
-	protected void crecerArreglo() {
+    protected void crecerArreglo() {
         Object[] old_items = items;
         int old_capacity = capacity;
 
