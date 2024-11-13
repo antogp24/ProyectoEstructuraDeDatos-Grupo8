@@ -1,7 +1,6 @@
 package ec.edu.espol;
 
 import java.util.Scanner;
-import java.util.Map;
 import java.util.Arrays;
 
 public class Main {
@@ -19,11 +18,24 @@ public class Main {
         }
     }
 
-    static final Map<String, String> comandos = Map.of(
-        "ayuda",              "Imprimir esta ayuda",
-        "contacto nuevo",     "Crear un contacto nuevo",
-        "cerrar",             "Cerrar la aplicación"
-    );
+    static final class Cmd_Desc_Pair {
+        String command;
+        String description;
+
+        public Cmd_Desc_Pair(String command, String description) {
+            this.command = command;
+            this.description = description;
+        }
+    }
+
+    static final Cmd_Desc_Pair[] comandos = {
+        new Cmd_Desc_Pair("ayuda",              "Imprimir esta ayuda"),
+        new Cmd_Desc_Pair("contacto nuevo",     "Crear un contacto nuevo"),
+        new Cmd_Desc_Pair("contacto lista",     "Visualizar la lista de contactos"),
+        new Cmd_Desc_Pair("contacto anterior",  "Mover el cursor al contacto anterior"),
+        new Cmd_Desc_Pair("contacto siguiente", "Mover el cursor al contacto siguiente"),
+        new Cmd_Desc_Pair("cerrar",             "Cerrar la aplicación"),
+    };
 
     static void process_command(String command, Scanner scanner) {
         String[] parts = command.split(" ");
@@ -52,6 +64,20 @@ public class Main {
                 contactos.add(nuevo);
             } break;
 
+            case "lista": {
+                visualize_commands();
+            } break;
+
+            case "siguiente": {
+                indice_contacto_activo = (indice_contacto_activo + 1) % contactos.size();
+                visualize_commands();
+            } break;
+
+            case "anterior": {
+                indice_contacto_activo = mod(indice_contacto_activo - 1, contactos.size());
+                visualize_commands();
+            } break;
+
             default: {
                 System.out.println("Argumento inválido: \"" + args[0] + '"');
                  System.out.println("    Escribe \"ayuda\" para ver los argumentos válidos");
@@ -74,8 +100,21 @@ public class Main {
             System.out.println("Intentalo de nuevo.");
             return;
         }
-        comandos.forEach((comando, descripcion) -> {
-            System.out.printf("| %-15s | %-25s |\n", comando, descripcion);
-        });
+        for (int i = 0; i < comandos.length; i++) {
+            System.out.printf("| %-20s | %-45s |\n", comandos[i].command, comandos[i].description);
+        }
+    }
+
+    static void visualize_commands() {
+        for (int i = 0; i < contactos.size(); i++) {
+            String nombre = contactos.get(i).nombre;
+            String cursor = (i == indice_contacto_activo) ? "->" : "  ";
+
+            System.out.printf("%s contacto #%d: '%s'\n", cursor, i+1, nombre);
+        }
+    }
+
+    static int mod(int a, int b) {
+        return (a % b + b) % b;
     }
 }
