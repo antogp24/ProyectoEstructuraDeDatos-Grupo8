@@ -1,6 +1,7 @@
 package ec.edu.espol;
 
 import java.util.Scanner;
+
 import java.util.Arrays;
 
 public class Main {
@@ -10,7 +11,6 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
         while (running_app){
             System.out.print("Ingresa un comando: ");
             String comando = scanner.nextLine();

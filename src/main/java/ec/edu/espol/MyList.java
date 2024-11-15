@@ -51,10 +51,34 @@ public class MyList<T> {
         items[length++] = value;
     }
 
+    public void add(int index, T value) {
+        if (length + 1 > capacity) crecerArreglo();
+
+        for (int i = length; i > index; i--) {
+            items[i] = items[i-1];
+        }
+        items[index] = value;
+
+        length++;
+    }
+
     public int find(T item) {
         for (int i = 0; i < this.length; i++) {
             if (items[i] == item) return i;
         }
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("MyList{");
+
+        for (int i = 0; i < length; i++) {
+            if (i > 0) builder.append(", ");
+            builder.append(get(i));
+        }
+        builder.append("}");
+
+        return builder.toString();
     }
 }
