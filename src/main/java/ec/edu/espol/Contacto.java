@@ -1,9 +1,18 @@
 package ec.edu.espol;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.channels.Pipe.SourceChannel;
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Contacto {
+public class Contacto implements Serializable{
     String nombre;                                      // No tiene que ser único
     Foto foto;                                          // Foto de la persona
     String direccion;                                   // ejemplo: Ecuador, Guayaquil
@@ -12,6 +21,7 @@ public class Contacto {
     MyList<String> identificadores_de_redes_sociales;   // ejemplo: #hola
     MyList<FechaDeInteres> fechas_de_interes;           // Puede estar vacío
     MyList<String> contactos_relacionados;              // Cada uno es un número de teléfono
+    public static final String nomArchivo = "contactos.ser"; 
 
     private static int nextCount(Scanner scanner, String message) {
         int result = -1;
@@ -84,4 +94,51 @@ public class Contacto {
         
         return contacto;
     }
+
+    @Override
+    public String toString() {
+        return "Contacto{" +
+                "nombre='" + nombre + '\'' +
+                ", foto='" + foto.path + '\'' +
+                ", emails='" + emails+ '\'' +
+                ", telefonos='" + numeros_de_telefono+ '\'' +
+                ", identificadores='" + identificadores_de_redes_sociales+ '\'' +
+                ", fechas de interes='" + fechas_de_interes+ '\'' + 
+                ", contactos relacionados='" + contactos_relacionados+ '\'' +
+                '}';
+    }
+
+    // Metodos para serializar y deserializar
+
+    public static boolean guardarLista(MyList<Contacto> contactos) throws Exception{
+        boolean guardado = false;
+        File f = new File(nomArchivo);
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f))) {
+            os.writeObject(contactos);
+            guardado = true;
+        } catch (IOException e) {
+
+            //quizas lanzar una excepcion personalizada
+            throw new Exception(e.getMessage());
+        }
+        return guardado;
+    }
+
+    //lee el archivo donde se encuentran los datos
+    public static MyList<Contacto> cargarContactos (){
+        MyList<Contacto> contactos = new MyList<>();
+        File f = new File(nomArchivo);
+        //se escribe la lista serializada
+        if ( f.exists()) { //si no existe se crea la lista
+            try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(f))) {
+                contactos = (MyList<Contacto>) is.readObject();
+
+            } catch (Exception e) {
+                //quizas lanzar una excepcion personalizada
+                new Exception(e.getMessage());
+            }
+        }
+        return contactos;
+    }
+
 }

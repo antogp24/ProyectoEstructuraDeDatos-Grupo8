@@ -62,10 +62,24 @@ public class Main {
             case "nuevo": {
                 Contacto nuevo = Contacto.next(scanner);
                 contactos.add(nuevo);
+                try {
+                    Boolean guardado=Contacto.guardarLista(contactos);
+                    System.out.println(guardado);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             } break;
 
             case "lista": {
                 visualize_commands();
+                contactos=Contacto.cargarContactos();
+                MyList< Contacto>.CustomMyListIterator iterator = contactos.iterator();
+                // Recorrer todos los elementos
+                while (iterator.hasNext()) {
+                    System.out.println(iterator.next());
+                }
+
             } break;
 
             case "siguiente": {

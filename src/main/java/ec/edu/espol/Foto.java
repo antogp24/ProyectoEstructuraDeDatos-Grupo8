@@ -1,6 +1,8 @@
 package ec.edu.espol;
 
-public class Foto {
+import java.io.Serializable;
+
+public class Foto implements Serializable {
     String path;
     int[] pixels;
     int width;

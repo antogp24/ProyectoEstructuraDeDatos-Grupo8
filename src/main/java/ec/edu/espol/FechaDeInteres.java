@@ -1,11 +1,12 @@
 package ec.edu.espol;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
-public class FechaDeInteres {
+public class FechaDeInteres implements Serializable {
     String nombre;
     LocalDate fecha;
     
