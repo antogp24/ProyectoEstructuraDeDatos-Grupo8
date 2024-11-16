@@ -72,9 +72,10 @@ public class MyList<T> implements Serializable {
         return -1;
     }
 
+    /* */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("MyList{");
+        StringBuilder builder = new StringBuilder("{");
 
         for (int i = 0; i < length; i++) {
             if (i > 0) builder.append(", ");
@@ -84,6 +85,7 @@ public class MyList<T> implements Serializable {
 
         return builder.toString();
     }
+    
 
 
     //-------------- Iterador Provisional(Para ArrayList)---------------

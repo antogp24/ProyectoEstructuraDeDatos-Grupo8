@@ -23,4 +23,10 @@ public class Foto implements Serializable {
     public int getHeight() {
         return height;
     }
+
+    @Override
+    public String toString() {
+        return "Path = " + this.path + '\t' 
+                ;
+    }
 }

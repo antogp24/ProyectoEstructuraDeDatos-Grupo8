@@ -48,4 +48,11 @@ public class FechaDeInteres implements Serializable {
     public static FechaDeInteres next(Scanner scanner) {
         return next(scanner, "");
     }
+
+    @Override
+    public String toString() {
+        return  " " + this.nombre + " : "  +
+                this.getFecha()  
+                ;
+    }
 }

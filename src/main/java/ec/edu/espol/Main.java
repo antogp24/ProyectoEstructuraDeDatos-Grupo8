@@ -32,6 +32,8 @@ public class Main {
         new Cmd_Desc_Pair("ayuda",              "Imprimir esta ayuda"),
         new Cmd_Desc_Pair("contacto nuevo",     "Crear un contacto nuevo"),
         new Cmd_Desc_Pair("contacto lista",     "Visualizar la lista de contactos"),
+        new Cmd_Desc_Pair("contacto editar",    "Editar un contacto existente"),
+        new Cmd_Desc_Pair("contacto eliminar",  "Eliminar un contacto existente"),
         new Cmd_Desc_Pair("contacto anterior",  "Mover el cursor al contacto anterior"),
         new Cmd_Desc_Pair("contacto siguiente", "Mover el cursor al contacto siguiente"),
         new Cmd_Desc_Pair("cerrar",             "Cerrar la aplicación"),
@@ -64,7 +66,7 @@ public class Main {
                 contactos.add(nuevo);
                 try {
                     Boolean guardado=Contacto.guardarLista(contactos);
-                    System.out.println(guardado);
+                    //System.out.println(guardado);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -77,7 +79,7 @@ public class Main {
                 MyList< Contacto>.CustomMyListIterator iterator = contactos.iterator();
                 // Recorrer todos los elementos
                 while (iterator.hasNext()) {
-                    System.out.println(iterator.next());
+                    System.out.println(iterator.next()+"\n");
                 }
 
             } break;
@@ -89,6 +91,15 @@ public class Main {
 
             case "anterior": {
                 indice_contacto_activo = mod(indice_contacto_activo - 1, contactos.size());
+                visualize_commands();
+            } break;
+
+            case "editar": {
+                 editar_contacto(scanner);
+            } break;
+
+            case "eliminar": {
+                
                 visualize_commands();
             } break;
 
@@ -130,5 +141,35 @@ public class Main {
 
     static int mod(int a, int b) {
         return (a % b + b) % b;
+    }
+
+    static void editar_contacto(Scanner scanner){
+        System.out.println("Ingrese el teléfono del contacto a editar: ");
+                String telefono_a_editar = scanner.nextLine();
+                contactos=Contacto.cargarContactos();
+                MyList< Contacto>.CustomMyListIterator iteratorContactos = contactos.iterator();
+                // Recorrer todos los elementos
+                while (iteratorContactos.hasNext()) {
+                    Contacto actual = new Contacto();
+                    actual = iteratorContactos.next();
+                    MyList<String> telefonos = actual.numeros_de_telefono;
+                    MyList< String>.CustomMyListIterator iteratorTelefonos = telefonos.iterator(); 
+                    while (iteratorTelefonos.hasNext()) { // se itera para buscar un teléfono que coincida sin necesidad de que sea el primero
+                        if (telefono_a_editar.equals(iteratorTelefonos.next())){
+                            int indice= contactos.find(actual);
+                            Contacto nuevo = Contacto.next(scanner);
+                            contactos.set(indice, nuevo);
+                            System.out.println("Contacto editado exitosamente");
+                            try {
+                                Contacto.guardarLista(contactos);
+                                return;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }        
+                }
+                System.out.println("Contacto no encontrado");
+               
     }
 }
