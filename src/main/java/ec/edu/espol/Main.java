@@ -11,8 +11,9 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        ver_comandos();
         while (running_app){
-            System.out.print("Ingresa un comando: ");
+            System.out.print("\nIngresa un comando: ");
             String comando = scanner.nextLine();
             process_command(comando, scanner);
         }
@@ -65,8 +66,7 @@ public class Main {
                 Contacto nuevo = Contacto.next(scanner);
                 contactos.add(nuevo);
                 try {
-                    Boolean guardado=Contacto.guardarLista(contactos);
-                    //System.out.println(guardado);
+                    Contacto.guardarLista(contactos);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -77,7 +77,6 @@ public class Main {
                 visualize_commands();
                 contactos=Contacto.cargarContactos();
                 MyList< Contacto>.CustomMyListIterator iterator = contactos.iterator();
-                // Recorrer todos los elementos
                 while (iterator.hasNext()) {
                     System.out.println(iterator.next()+"\n");
                 }
@@ -99,8 +98,7 @@ public class Main {
             } break;
 
             case "eliminar": {
-                
-                visualize_commands();
+                eliminar_contacto(scanner);
             } break;
 
             default: {
@@ -130,7 +128,14 @@ public class Main {
         }
     }
 
-    static void visualize_commands() {
+    static void ver_comandos(){
+        System.out.println("-------------------------"+" Comandos Generales " + "-------------------------");
+        for (int i = 0; i < comandos.length; i++) {
+            System.out.printf("| %-20s | %-45s |\n", comandos[i].command, comandos[i].description);
+        }
+    }
+
+    static void visualize_commands() { // cambiar el nombre a visualize_contacts
         for (int i = 0; i < contactos.size(); i++) {
             String nombre = contactos.get(i).nombre;
             String cursor = (i == indice_contacto_activo) ? "->" : "  ";
@@ -160,6 +165,34 @@ public class Main {
                             Contacto nuevo = Contacto.next(scanner);
                             contactos.set(indice, nuevo);
                             System.out.println("Contacto editado exitosamente");
+                            try {
+                                Contacto.guardarLista(contactos);
+                                return;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }        
+                }
+                System.out.println("Contacto no encontrado");
+               
+    }
+
+    static void eliminar_contacto(Scanner scanner){
+        System.out.println("Ingrese el teléfono del contacto a eliminar: ");
+                String telefono_a_editar = scanner.nextLine();
+                contactos=Contacto.cargarContactos();
+                MyList< Contacto>.CustomMyListIterator iteratorContactos = contactos.iterator();
+                // Recorrer todos los elementos
+                while (iteratorContactos.hasNext()) {
+                    Contacto actual = new Contacto();
+                    actual = iteratorContactos.next();
+                    MyList<String> telefonos = actual.numeros_de_telefono;
+                    MyList< String>.CustomMyListIterator iteratorTelefonos = telefonos.iterator(); 
+                    while (iteratorTelefonos.hasNext()) { // se itera para buscar un teléfono que coincida sin necesidad de que sea el primero
+                        if (telefono_a_editar.equals(iteratorTelefonos.next())){
+                            iteratorContactos.remove();
+                            System.out.println("Contacto eliminado exitosamente");
                             try {
                                 Contacto.guardarLista(contactos);
                                 return;
