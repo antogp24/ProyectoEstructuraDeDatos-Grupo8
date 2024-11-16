@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 public class Contacto implements Serializable{
     String nombre;                                      // No tiene que ser único
+    Tipo tipo;                                          // Tipo de contacto
     Foto foto;                                          // Foto de la persona
     String direccion;                                   // ejemplo: Ecuador, Guayaquil
     MyList<String> emails;                              // El primero es el principal
@@ -41,10 +42,24 @@ public class Contacto implements Serializable{
     }
     
     public static Contacto next(Scanner scanner) {
-        Contacto contacto = new Contacto();
         
+        System.out.print("Tipo (Ingrese 'P' para persona o 'E' para empresa): ");
+        String tipo = scanner.nextLine();
+        while (!(tipo.equalsIgnoreCase("P") || tipo.equalsIgnoreCase("E") )){
+            System.out.println("Ingrese un tipo de contacto válido: "); 
+            System.out.print("Tipo (Ingrese 'P' para persona o 'E' para empresa): ");
+            tipo = scanner.nextLine();
+        }
+        
+        if (tipo.equalsIgnoreCase("P")){
+            ContactoPersonal contacto = new ContactoPersonal();
+            contacto.tipo= Tipo.PERSONA;
+
         System.out.print("Nombre: ");
         contacto.nombre = scanner.nextLine();
+
+        System.out.print("Apellido: ");
+        contacto.apellido = scanner.nextLine();
         
         System.out.print("Foto (path): ");
         contacto.foto = new Foto(scanner.nextLine());
@@ -92,7 +107,77 @@ public class Contacto implements Serializable{
             contacto.contactos_relacionados.set(i, input);
         }
         
+        System.out.println("Contacto agregado exitosamente.");
         return contacto;
+
+    } else if (tipo.equalsIgnoreCase("E")) {
+        ContactoEmpresa contacto = new ContactoEmpresa();
+
+        contacto.tipo= Tipo.EMPRESA;
+
+        System.out.print("Nombre: ");
+        contacto.nombre = scanner.nextLine();
+        
+        System.out.print("Foto (path): ");
+        contacto.foto = new Foto(scanner.nextLine());
+        
+        System.out.print("Dirección: ");
+        contacto.direccion = scanner.nextLine();
+        
+        int emails_count = nextCount(scanner, "Cuantos emails?: ");
+        contacto.emails = new MyList<>(emails_count, true);
+        for (int i = 0; i < emails_count; i++) {
+            System.out.printf("Email %d: ", i+1);
+            String input = scanner.nextLine();
+            contacto.emails.set(i, input);
+        }
+        
+        int numeros_de_telefono_count = nextCount(scanner, "Cuantos numeros_de_telefono?: ");
+        contacto.numeros_de_telefono = new MyList<>(numeros_de_telefono_count, true);
+        for (int i = 0; i < numeros_de_telefono_count; i++) {
+            System.out.printf("Numero de teléfono %d: ", i+1);
+            String input = scanner.nextLine();
+            contacto.numeros_de_telefono.set(i, input);
+        }
+
+        int sucursales_count = nextCount(scanner, "Cuantas sucursales?: ");
+        contacto.sucursales = new MyList<>(sucursales_count, true);
+        for (int i = 0; i < sucursales_count; i++) {
+            System.out.printf("Sucursal %d: ", i+1);
+            String input = scanner.nextLine();
+            contacto.sucursales.set(i, input);
+        }
+        
+        int identificadores_de_redes_sociales_count = nextCount(scanner, "Cuantos identificadores de redes sociales?: ");
+        contacto.identificadores_de_redes_sociales = new MyList<>(identificadores_de_redes_sociales_count, true);
+        for (int i = 0; i < identificadores_de_redes_sociales_count; i++) {
+            System.out.printf("Identificador %d: ", i+1);
+            String input = scanner.nextLine();
+            contacto.identificadores_de_redes_sociales.set(i, input);
+        }
+        
+        int fechas_de_interes_count = nextCount(scanner, "Cuantas fechas de interes?: ");
+        contacto.fechas_de_interes = new MyList<>(fechas_de_interes_count, true);
+        for (int i = 0; i < fechas_de_interes_count; i++) {
+            System.out.printf("Fecha de interés %d:\n", i+1);
+            FechaDeInteres input = FechaDeInteres.next(scanner, "\t");
+            contacto.fechas_de_interes.set(i, input);
+        }
+        
+        int contactos_relacionados_count = nextCount(scanner, "Cuantos contactos relacionados?: ");
+        contacto.contactos_relacionados = new MyList<>(contactos_relacionados_count, true);
+        for (int i = 0; i < contactos_relacionados_count; i++) {
+            System.out.printf("Número de teléfono de contacto relacionado %d: ", i+1);
+            String input = scanner.nextLine();
+            contacto.contactos_relacionados.set(i, input);
+        }
+        
+        System.out.println("Contacto agregado exitosamente.");
+        return contacto;
+    }
+
+    Contacto contacto= null;
+    return contacto;
     }
 
     @Override
@@ -108,7 +193,7 @@ public class Contacto implements Serializable{
                 ;
     }
 
-    
+
 
     // Metodos para serializar y deserializar
 
