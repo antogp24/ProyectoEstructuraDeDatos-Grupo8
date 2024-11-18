@@ -228,4 +228,20 @@ public class Contacto implements Serializable{
         return contactos;
     }
 
+    //Causa inconsistencias con el resto de iteradores 
+    /* 
+    public static LocalDate obtenerFechaNacimiento(Contacto contacto) {
+        MyList<FechaDeInteres> fechas= contacto.fechas_de_interes;
+        MyList< FechaDeInteres>.CustomMyListIterator iteratorFecha =fechas.iterator();
+        
+        while (iteratorFecha.hasNext()) {
+            FechaDeInteres f=iteratorFecha.next();
+            if ("Nacimiento".equalsIgnoreCase(f.getNombre())) {
+                return f.getFecha();
+            }
+        }
+        
+        return null; // Si no tiene fecha de "Nacimiento", devolvemos null
+    }
+    */
 }
