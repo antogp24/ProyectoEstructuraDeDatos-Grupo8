@@ -27,7 +27,7 @@ public class Comparadores {
     }
     
     //Necesita de obtenerFechaNacimiento
-     /* 
+     
     public static class ComparadorPorCumpleanos implements Comparator<Contacto> {
    
    
@@ -52,7 +52,7 @@ public class Comparadores {
         return fechaNacimiento1.compareTo(fechaNacimiento2);
     }
     }
-    */
+    
 
     public static class ComparadorPorTipoDeContacto implements Comparator<Contacto> {
         @Override

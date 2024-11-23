@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -166,19 +167,19 @@ public class Contacto implements Serializable{
     }
 
     //Causa inconsistencias con el resto de iteradores 
-    /* 
+    
     public static LocalDate obtenerFechaNacimiento(Contacto contacto) {
         MyList<FechaDeInteres> fechas= contacto.fechas_de_interes;
         MyList< FechaDeInteres>.CustomMyListIterator iteratorFecha =fechas.iterator();
         
         while (iteratorFecha.hasNext()) {
             FechaDeInteres f=iteratorFecha.next();
-            if ("Nacimiento".equalsIgnoreCase(f.getNombre())) {
+            if (f != null && "Nacimiento".equalsIgnoreCase(f.getNombre())) {
                 return f.getFecha();
             }
         }
         
         return null; // Si no tiene fecha de "Nacimiento", devolvemos null
     }
-    */
+
 }
