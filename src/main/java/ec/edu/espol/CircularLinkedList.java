@@ -1,20 +1,25 @@
 package ec.edu.espol;
 
-import java.util.Iterator;
+import java.io.Serializable;
 
-public class CircularLinkedList<T> {
+public class CircularLinkedList<T> implements Iterable<T>, Serializable {
     protected Node<T> head;
     protected int length;
 
-    public static class Node<T> {
-        T value;
-        Node<T> next;
-        Node<T> prev;
+    public static class Node<T> implements Serializable{
+        public T value;
+        public Node<T> next;
+        public Node<T> prev;
 
         public Node(T value) {
             this.value = value;
             this.next = null;
             this.prev = null;
+        }
+
+        @Override
+        public String toString() {
+            return Integer.toHexString(hashCode());
         }
     }
 
@@ -23,7 +28,7 @@ public class CircularLinkedList<T> {
         this.length = 0;
     }
 
-    public boolean is_empty() {
+    public boolean isEmpty() {
         return length == 0;
     }
 
@@ -53,7 +58,7 @@ public class CircularLinkedList<T> {
     }
 
     public void add(T value) {
-        if (is_empty()) {
+        if (isEmpty()) {
             head = new Node<>(value);
             head.prev = head;
             head.next = head;
@@ -69,7 +74,7 @@ public class CircularLinkedList<T> {
     }
 
     public void add_first(T value) {
-        if (is_empty()) {
+        if (isEmpty()) {
             head = new Node<>(value);
             head.prev = head;
             head.next = head;
@@ -90,11 +95,11 @@ public class CircularLinkedList<T> {
             if (i == index) break;
             cursor = cursor.next;
         }
-        add(cursor, value);
+        add_at_node(cursor, value);
     }
 
-    public void add(Node<T> cursor, T value) {
-        if (cursor == null && !is_empty()) return;
+    public void add_at_node(Node<T> cursor, T value) {
+        if (cursor == null && !isEmpty()) return;
 
         if (cursor == head) {
             add(value);
@@ -106,7 +111,7 @@ public class CircularLinkedList<T> {
         }
 
         // head node tail
-        if (is_empty()) {
+        if (isEmpty()) {
             head = new Node<>(value);
             head.prev = head;
             head.next = head;
@@ -121,6 +126,9 @@ public class CircularLinkedList<T> {
     }
 
     public void remove(int index) {
+        if (index < 0 || index >= length) {
+            throw new IndexOutOfBoundsException();
+        }
         Node<T> cursor = head;
         for (int i = 0; i < length; i++) {
             if (i == index) break;
@@ -130,7 +138,7 @@ public class CircularLinkedList<T> {
     }
 
     public T removeFirst() {
-        if (is_empty()) return null;
+        if (isEmpty()) return null;
         T removed = head.value;
 
         if (head.next == head) {
@@ -147,7 +155,7 @@ public class CircularLinkedList<T> {
     }
 
     public T removeLast() {
-        if (is_empty()) return null;
+        if (isEmpty()) return null;
         T removed = head.prev.value;
 
         if (head.next == head) {
@@ -162,22 +170,30 @@ public class CircularLinkedList<T> {
         return removed;
     }
 
-    public T remove_at_node(Node<T> cursor) {
-        if (is_empty()) return null;
+    public Node<T> remove_at_node(Node<T> cursor) {
+        if (isEmpty()) return null;
 
-        if (cursor == head) return removeFirst();
-        if (cursor == head.prev) return removeLast();
-        T removed = cursor.value;
+        if (cursor == head) {
+            removeFirst();
+            return head;
+        }
+        if (cursor == head.prev) {
+            removeLast();
+            return isEmpty() ? null : head.prev;
+        }
+        Node<T> node_after_removed = null;
 
         if (head.next == head) {
+            node_after_removed = null;
             head = null;
         } else {
+            node_after_removed = cursor.next;
             cursor.prev.next = cursor.next;
             cursor.next.prev = cursor.prev;
         }
 
         length--;
-        return removed;
+        return node_after_removed;
     }
 
     @Override
@@ -187,11 +203,18 @@ public class CircularLinkedList<T> {
         Node<T> node = head;
         for (int i = 0; i < length; i++) {
             if (i > 0) builder.append(", ");
+            builder.append("(" + node.toString() + ":");
             builder.append(node.value);
+            builder.append(")");
             node = node.next;
         }
 
         builder.append("}");
         return builder.toString();
+    }
+
+    @Override
+    public CircularLinkedListIterator<T> iterator() {
+        return new CircularLinkedListIterator<>(this);
     }
 }

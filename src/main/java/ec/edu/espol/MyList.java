@@ -3,8 +3,8 @@ package ec.edu.espol;
 import java.io.Serializable;
 import java.util.Iterator;
 
-public class MyList<T> implements Serializable {
-    protected Object[] items; //
+public class MyList<T> implements Serializable, Iterable<T> {
+    protected Object[] items;
     protected int length;
     protected int capacity;
     
@@ -106,6 +106,7 @@ public class MyList<T> implements Serializable {
         }
 
         // Devuelve el siguiente elemento
+        @SuppressWarnings("unchecked")
         @Override
         public T next() {
             if (!hasNext()) throw new IllegalStateException("No more elements");
@@ -129,6 +130,7 @@ public class MyList<T> implements Serializable {
         }
 
         // Devuelve el próximo elemento sin avanzar
+        @SuppressWarnings("unchecked")
         public T peek() {
             if (!hasNext()) throw new IllegalStateException("No more elements to peek");
             return (T) items[currentIndex];
