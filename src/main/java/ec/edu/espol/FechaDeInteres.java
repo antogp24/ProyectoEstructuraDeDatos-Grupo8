@@ -44,7 +44,7 @@ public class FechaDeInteres implements Serializable {
         
         return new FechaDeInteres(nombre, fecha);
     }
-    
+
     public static FechaDeInteres next(Scanner scanner) {
         return next(scanner, "");
     }

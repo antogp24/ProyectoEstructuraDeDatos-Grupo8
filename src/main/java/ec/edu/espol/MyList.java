@@ -27,6 +27,10 @@ public class MyList<T> implements Serializable, Iterable<T> {
     public int size() {
         return length;
     }
+
+    public boolean isEmpty() {
+        return length == 0;
+    }
     
     @SuppressWarnings("unchecked")
     public T get(int i) {

@@ -3,6 +3,8 @@ package ec.edu.espol;
 import java.util.Scanner;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.InputMismatchException;
 
 public class Main {
     static CircularLinkedList<Contacto> contactos;
@@ -18,11 +20,11 @@ public class Main {
         cursor_contactos.next();
 
         Scanner scanner = new Scanner(System.in);
-        ver_comandos();
+        imprimirTablaComandos();
         while (running_app) {
             System.out.print("\nIngresa un comando: ");
             String comando = scanner.nextLine();
-            process_command(comando, scanner);
+            procesarComando(comando, scanner);
         }
         guardarProgreso();
     }
@@ -38,40 +40,40 @@ public class Main {
     }
 
     static final Cmd_Desc_Pair[] comandos = {
-        new Cmd_Desc_Pair("ayuda",              "Imprimir esta ayuda"),
-        new Cmd_Desc_Pair("contacto nuevo",     "Crear un contacto nuevo"),
-        new Cmd_Desc_Pair("contacto lista",     "Visualizar la lista de contactos"),
-        new Cmd_Desc_Pair("contacto editar",    "Editar el contacto del cursor"),
-        new Cmd_Desc_Pair("contacto #editar",   "Editar un contacto a partir de su número"),
-        new Cmd_Desc_Pair("contacto eliminar",  "Eliminar el contacto del cursor"),
-        new Cmd_Desc_Pair("contacto #eliminar", "Eliminar un contacto a partir de su número"),
-        new Cmd_Desc_Pair("contacto anterior",  "Mover el cursor al contacto anterior"),
-        new Cmd_Desc_Pair("contacto siguiente", "Mover el cursor al contacto siguiente"),
-        new Cmd_Desc_Pair("cerrar",             "Cerrar la aplicación"),
+        new Cmd_Desc_Pair("ayuda",     "Imprimir esta ayuda"),
+        new Cmd_Desc_Pair("cerrar",    "Cerrar la aplicación"),
+        new Cmd_Desc_Pair("lista",     "Visualizar la lista de contactos"),
+        new Cmd_Desc_Pair("anterior",  "Mover el cursor al contacto anterior"),
+        new Cmd_Desc_Pair("siguiente", "Mover el cursor al contacto siguiente"),
+        new Cmd_Desc_Pair("nuevo",     "Crear un contacto nuevo"),
+        new Cmd_Desc_Pair("editar",    "Editar el contacto del cursor"),
+        new Cmd_Desc_Pair("#editar",   "Editar un contacto a partir de su número"),
+        new Cmd_Desc_Pair("eliminar",  "Eliminar el contacto del cursor"),
+        new Cmd_Desc_Pair("#eliminar", "Eliminar un contacto a partir de su número"),
+        new Cmd_Desc_Pair("filtrar",   "Buscar los contactos que cumplen un criterio"),
+        new Cmd_Desc_Pair("ordenar",   "Ordenar la lista de contactos en base a un criterio"),
     };
 
-    static void process_command(String command, Scanner scanner) {
+    static void procesarComando(String command, Scanner scanner) {
         String[] parts = command.split(" ");
         String[] args = Arrays.copyOfRange(parts, 1, parts.length);
 
         switch (parts[0]) {
-            case "ayuda": command_ayuda(args); break;
-            case "cerrar": command_cerrar(args); break;
-            case "contacto": command_contacto(args, scanner); break;
-            default: {
-                System.out.println("Comando inválido: \"" + parts[0]+ '"');
-                System.out.println("    Escribe \"ayuda\" para ver los comandos válidos");
-            }
-        }
-    }
+            case "ayuda": comandoAyuda(args); break;
+            case "cerrar": comandoCerrar(args); break;
 
-    static void command_contacto(String[] args, Scanner scanner) {
-        if (args.length != 1) {
-            System.out.println("Se esperaba 1 argumento para este comando.");
-            System.out.println("Intentalo de nuevo.");
-            return;
-        }
-        switch (args[0]) {
+            case "lista": imprimirListaContactos(); break;
+
+            case "siguiente": {
+                cursor_contactos.next();
+                imprimirListaContactos();
+            } break;
+
+            case "anterior": {
+                cursor_contactos.prev();
+                imprimirListaContactos();
+            } break;
+
             case "nuevo": {
                 Contacto nuevo = Contacto.next(scanner);
                 contactos.add(nuevo);
@@ -79,44 +81,23 @@ public class Main {
                 if (AUTOGUARDADO) guardarProgreso();
             } break;
 
-            case "lista": {
-                ver_contactos();
-            } break;
+            case "editar": editar_contacto_del_cursor(scanner); break;
+            case "#editar": editar_contacto_por_numero(scanner); break;
 
-            case "siguiente": {
-                cursor_contactos.next();
-                ver_contactos();
-            } break;
+            case "eliminar": eliminar_contacto_del_cursor(); break;
+            case "#eliminar": eliminar_contacto_por_numero(scanner); break;
 
-            case "anterior": {
-                cursor_contactos.prev();
-                ver_contactos();
-            } break;
-
-            case "editar": {
-                editar_contacto_del_cursor(scanner);
-            } break;
-
-            case "#editar": {
-                editar_contacto_por_numero(scanner);
-            } break;
-
-            case "eliminar": {
-                eliminar_contacto_del_cursor();
-            } break;
-
-            case "#eliminar": {
-                eliminar_contacto_por_numero(scanner);
-            } break;
+            case "filtrar": comandoFiltrar(scanner); break;
+            case "ordenar": comandoOrdenar(scanner); break;
 
             default: {
-                System.out.println("Argumento inválido: \"" + args[0] + '"');
-                System.out.println("    Escribe \"ayuda\" para ver los argumentos válidos");
+                System.out.println("Comando inválido: \"" + parts[0]+ '"');
+                System.out.println("    Escribe \"ayuda\" para ver los comandos válidos");
             }
         }
     }
 
-    static void command_cerrar(String[] args) {
+    static void comandoCerrar(String[] args) {
         if (args.length != 0) {
             System.out.println("Se esperaba 0 argumentos para este comando.");
             System.out.println("Intentalo de nuevo.");
@@ -125,26 +106,26 @@ public class Main {
         running_app = false;
     }
 
-    static void command_ayuda(String[] args) {
+    static void comandoAyuda(String[] args) {
         if (args.length != 0) {
             System.out.println("Se esperaba 0 argumentos para este comando.");
             System.out.println("Intentalo de nuevo.");
             return;
         }
-        ver_comandos();
+        imprimirTablaComandos();
     }
 
-    static void ver_comandos() {
-        System.out.printf("+----------------------------------------------------------------------+\n");
-        System.out.printf("|                          Comandos Generales                          |\n");
-        System.out.printf("+----------------------+-----------------------------------------------+\n");
+    static void imprimirTablaComandos() {
+        System.out.printf("+---------------------------------------------------------------------------+\n");
+        System.out.printf("|                          Comandos Generales                               |\n");
+        System.out.printf("+-----------------+---------------------------------------------------------+\n");
         for (int i = 0; i < comandos.length; i++) {
-            System.out.printf("| %-20s | %-45s |\n", comandos[i].command, comandos[i].description);
+            System.out.printf("| %-15s | %-55s |\n", comandos[i].command, comandos[i].description);
         }
-        System.out.printf("+----------------------+-----------------------------------------------+\n");
+        System.out.printf("+-----------------+---------------------------------------------------------+\n");
     }
 
-    static void ver_contactos() {
+    static void imprimirListaContactos() {
         int i = 0;
         CircularLinkedListIterator<Contacto> it = contactos.iterator();
         while (it.hasNext() && !it.hasLooped()) {
@@ -217,6 +198,99 @@ public class Main {
             }        
         }
         System.out.println("Contacto no encontrado");
+    }
+
+    static void comandoFiltrar(Scanner scanner) {
+        System.out.println("Criterios de busqueda:");
+        System.out.println("    1. Por mes de nacimiento.");
+        System.out.println("    2. Por país.");
+        System.out.println("    3. Por país y ciudad.");
+        System.out.println("    4. Todos los contactos personales.");
+        System.out.println("    5. Todos los contactos de empresa.");
+
+        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 1, 5);
+
+        MyList<Contacto> filtrado = switch (opcion) {
+            case 1 -> {
+                int mes = nextNumero(scanner, "Ingresa el mes (1-12): ", 1, 12);
+                yield BusquedaFiltrada.porMesDeNacimiento(mes);
+            }
+
+            case 2 -> {
+                System.out.print("País: ");
+                String pais = scanner.nextLine();
+                yield BusquedaFiltrada.porPais(pais);
+            }
+
+            case 3 -> {
+                System.out.print("País: ");
+                String pais = scanner.nextLine();
+                System.out.print("Ciudad: ");
+                String ciudad = scanner.nextLine();
+                yield BusquedaFiltrada.porPaisCiudad(pais, ciudad);
+            }
+
+            case 4 -> BusquedaFiltrada.tipoPersonal();
+            case 5 -> BusquedaFiltrada.tipoEmpresa();
+
+            default -> null;
+        };
+
+        if (filtrado == null || filtrado.isEmpty()) {
+            System.out.println("No hubieron resultados con este criterio.");
+            return;
+        }
+        for (Contacto contacto: filtrado) {
+            System.out.println(contacto);
+        }
+    }
+
+    static void comandoOrdenar(Scanner scanner) {
+        System.out.println("Criterios de ordenamiento:");
+        System.out.println("    1. Por nombre completo.");
+        System.out.println("    2. Por cantidad de telefonos.");
+        System.out.println("    3. Por identificadores de redes sociales.");
+        System.out.println("    4. Por cumpleaños.");
+        System.out.println("    5. Por tipo de contacto.");
+
+        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 1, 5);
+
+        Comparator<Contacto> comparador = switch (opcion) {
+            case 1 -> Comparadores.porNombreCompleto;
+            case 2 -> Comparadores.porCantidadDeTelefonos;
+            case 3 -> Comparadores.porIdentificadorRedesSociales;
+            case 4 -> Comparadores.porCumpleanios;
+            case 5 -> Comparadores.porTipoDeContacto;
+            default -> null;
+        };
+
+        if (comparador == null) {
+            throw new IllegalStateException("No se esperaba que el comparador fuera null. Revisa si cubriste todos los casos.");
+        }
+
+        contactos.sort(comparador);
+        cursor_contactos.reset();
+        cursor_contactos.next();
+        imprimirListaContactos();
+    }
+
+    public static int nextNumero(Scanner scanner, String prompt, int a, int b) {
+        int numero = a - 1;
+        do {
+            try {
+                System.out.print(prompt);
+                numero = scanner.nextInt();
+                scanner.nextLine();
+                if (numero < a || numero > b) {
+                    System.out.printf("Debe estar entre %i y %i. Intenta de nuevo.\n", a, b);
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Debe ser un entero. Intenta de nuevo.");
+                scanner.nextLine();
+            }
+        } while (numero < a || numero > b);
+
+        return numero;
     }
 
     static void guardarProgreso() {

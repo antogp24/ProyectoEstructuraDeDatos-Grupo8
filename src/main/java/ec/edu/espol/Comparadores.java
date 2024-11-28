@@ -19,7 +19,7 @@ public class Comparadores {
         );
     };
 
-    public static final Comparator<Contacto> porCumpleanos = (c1, c2) -> {
+    public static final Comparator<Contacto> porCumpleanios = (c1, c2) -> {
         LocalDate fechaNacimiento1 = c1.obtenerFechaNacimiento();
         LocalDate fechaNacimiento2 = c2.obtenerFechaNacimiento();
 

@@ -1,6 +1,7 @@
 package ec.edu.espol;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 public class CircularLinkedList<T> implements Iterable<T>, Serializable {
     protected Node<T> head;
@@ -216,5 +217,26 @@ public class CircularLinkedList<T> implements Iterable<T>, Serializable {
     @Override
     public CircularLinkedListIterator<T> iterator() {
         return new CircularLinkedListIterator<>(this);
+    }
+
+    public void sort(Comparator<T> comparator) {
+        if (isEmpty() || length == 1) return;
+
+        boolean swapped;
+        do {
+            swapped = false;
+            Node<T> current = head;
+            for (int i = 0; i < length - 1; i++) {
+                Node<T> next = current.next;
+                if (comparator.compare(current.value, next.value) > 0) {
+                    // Swap the values of the nodes
+                    T temp = current.value;
+                    current.value = next.value;
+                    next.value = temp;
+                    swapped = true;
+                }
+                current = current.next;
+            }
+        } while (swapped);
     }
 }

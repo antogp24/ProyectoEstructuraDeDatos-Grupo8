@@ -3,7 +3,7 @@ package ec.edu.espol;
 import java.time.LocalDate;
 
 public class BusquedaFiltrada {
-    public static CircularLinkedListIterator<Contacto> iterator = null;
+    private static CircularLinkedListIterator<Contacto> iterator = null;
 
     public static void setContactos(CircularLinkedList<Contacto> contactos) {
         iterator = contactos.iterator();
