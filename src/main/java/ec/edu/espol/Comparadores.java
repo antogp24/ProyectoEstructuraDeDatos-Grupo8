@@ -4,37 +4,24 @@ import java.time.LocalDate;
 import java.util.Comparator;
 
 public class Comparadores {
-     public static class ComparadorPorNombreCompleto implements Comparator<Contacto> {
-    @Override
-    public int compare(Contacto c1, Contacto c2) {
+    public static final Comparator<Contacto> porNombreCompleto = (c1, c2) -> {
         return c1.nombre.compareToIgnoreCase(c2.nombre);
-    }
-}
-    
-    public static class ComparadorPorCantidadDeTelefonos implements Comparator<Contacto> {
-    @Override
-    public int compare(Contacto c1, Contacto c2) {
-        return Integer.compare(c2.numeros_de_telefono.size(), c1.numeros_de_telefono.size()); // Más teléfonos primero
-    }
-} 
+    };
 
-    
-    public static class ComparadorPorIdentificadorRedesSociales implements Comparator<Contacto> {
-        @Override
-        public int compare(Contacto c1, Contacto c2) {
-            return Integer.compare(c2.identificadores_de_redes_sociales.size(), c1.identificadores_de_redes_sociales.size());
-        }
-    }
-    
-    //Necesita de obtenerFechaNacimiento
-     
-    public static class ComparadorPorCumpleanos implements Comparator<Contacto> {
-   
-   
-        @Override
-    public int compare(Contacto c1, Contacto c2) {
-        LocalDate fechaNacimiento1 = Contacto.obtenerFechaNacimiento(c1);
-        LocalDate fechaNacimiento2 = Contacto.obtenerFechaNacimiento(c2);
+    public static final Comparator<Contacto> porCantidadDeTelefonos = (c1, c2) -> {
+        return Integer.compare(c1.numeros_de_telefono.size(), c2.numeros_de_telefono.size());
+    };
+
+    public static final Comparator<Contacto> porIdentificadorRedesSociales = (c1, c2) -> {
+        return Integer.compare(
+            c1.identificadores_de_redes_sociales.size(),
+            c2.identificadores_de_redes_sociales.size()
+        );
+    };
+
+    public static final Comparator<Contacto> porCumpleanos = (c1, c2) -> {
+        LocalDate fechaNacimiento1 = c1.obtenerFechaNacimiento();
+        LocalDate fechaNacimiento2 = c2.obtenerFechaNacimiento();
 
         // Si ambos son nulos, son iguales
         if (fechaNacimiento1 == null && fechaNacimiento2 == null) {
@@ -50,21 +37,16 @@ public class Comparadores {
 
         // Comparar las fechas de nacimiento (LocalDate implementa Comparable)
         return fechaNacimiento1.compareTo(fechaNacimiento2);
-    }
-    }
-    
+    };
 
-    public static class ComparadorPorTipoDeContacto implements Comparator<Contacto> {
-        @Override
-        public int compare(Contacto c1, Contacto c2) {
-            // Primero, comprobamos si ambos objetos son de la misma clase
-            if (c1 instanceof ContactoEmpresa && c2 instanceof ContactoPersonal) {
-                return -1; // Las empresas primero
-            }
-            if (c1 instanceof ContactoPersonal && c2 instanceof ContactoEmpresa) {
-                return 1; // Las personas después
-            }
-            return 0;
+    public static final Comparator<Contacto> porTipoDeContacto = (c1, c2) -> {
+        // Primero, comprobamos si ambos objetos son de la misma clase
+        if (c1 instanceof ContactoEmpresa && c2 instanceof ContactoPersonal) {
+            return -1; // Las empresas primero
         }
-    }
+        if (c1 instanceof ContactoPersonal && c2 instanceof ContactoEmpresa) {
+            return 1; // Las personas después
+        }
+        return 0;
+    };
 }

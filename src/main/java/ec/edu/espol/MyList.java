@@ -17,7 +17,7 @@ public class MyList<T> implements Serializable, Iterable<T> {
     }
     
     public MyList(int capacity) {
-        this(capacity, true);
+        this(capacity, false);
     }
     
     public MyList() {

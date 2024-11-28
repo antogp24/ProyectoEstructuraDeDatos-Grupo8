@@ -20,6 +20,8 @@ public class Contacto implements Serializable{
     MyList<String> identificadores_de_redes_sociales;   // ejemplo: #hola
     MyList<FechaDeInteres> fechas_de_interes;           // Puede estar vacío
     MyList<String> contactos_relacionados;              // Cada uno es un número de teléfono
+    String pais;                                        // País de orígen o residencia.
+    String ciudad;                                      // Ciudad de orígen o residencia.
     public static final String nomArchivo = "contactos.ser"; 
 
     private static int nextCount(Scanner scanner, String message) {
@@ -118,20 +120,28 @@ public class Contacto implements Serializable{
                 contacto_empresa.sucursales.set(i, input);
             }
         }
+
+        System.out.print("País: ");
+        contacto.pais = scanner.nextLine();
         
+        System.out.print("Ciudad: ");
+        contacto.ciudad = scanner.nextLine();
+
         System.out.println("Contacto agregado exitosamente.");
         return contacto;
     }
 
     @Override
     public String toString() {
-        return "    - Nombre = " + nombre + '\n' +
-               "    - Foto = " + foto.path + '\n' +
-               "    - Emails = " + emails+ '\n' +
-               "    - Telefonos = " + numeros_de_telefono+ '\n' +
-               "    - Identificadores = " + identificadores_de_redes_sociales+ '\n' +
-               "    - Fechas de interes = " + fechas_de_interes+ '\n' + 
-               "    - Contactos relacionados = " + contactos_relacionados + '\n';
+        return "    - Nombre: " + nombre + '\n' +
+               "    - Foto: " + foto.path + '\n' +
+               "    - Emails: " + emails+ '\n' +
+               "    - Telefonos: " + numeros_de_telefono+ '\n' +
+               "    - Identificadores: " + identificadores_de_redes_sociales+ '\n' +
+               "    - Fechas de interes: " + fechas_de_interes+ '\n' + 
+               "    - Contactos relacionados: " + contactos_relacionados + '\n' +
+               "    - País: " + pais + '\n' +
+               "    - Ciudad: " + ciudad + '\n';
     }
 
     // Metodos para serializar y deserializar
@@ -166,19 +176,12 @@ public class Contacto implements Serializable{
         return contactos;
     }
 
-    //Causa inconsistencias con el resto de iteradores 
-    
-    public static LocalDate obtenerFechaNacimiento(Contacto contacto) {
-        MyList<FechaDeInteres> fechas= contacto.fechas_de_interes;
-        MyList< FechaDeInteres>.CustomMyListIterator iteratorFecha =fechas.iterator();
-        
-        while (iteratorFecha.hasNext()) {
-            FechaDeInteres f=iteratorFecha.next();
-            if (f != null && "Nacimiento".equalsIgnoreCase(f.getNombre())) {
-                return f.getFecha();
+    public LocalDate obtenerFechaNacimiento() {
+        for (FechaDeInteres fecha: fechas_de_interes) {
+            if (fecha != null && "Nacimiento".equalsIgnoreCase(fecha.getNombre())) {
+                return fecha.getFecha();
             }
         }
-        
         return null; // Si no tiene fecha de "Nacimiento", devolvemos null
     }
 

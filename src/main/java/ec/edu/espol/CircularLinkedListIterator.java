@@ -23,6 +23,10 @@ public class CircularLinkedListIterator<T> implements Iterator<T> {
         return new CircularLinkedListIterator<>(this);
     }
 
+    public CircularLinkedList<T> getList() {
+        return list;
+    }
+
     @Override
     public boolean hasNext() {
         return current_node != null && current_node.next != null;

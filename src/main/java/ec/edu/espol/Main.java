@@ -14,6 +14,8 @@ public class Main {
     public static void main(String[] args) {
         contactos = Contacto.cargarContactos();
         cursor_contactos = contactos.iterator();
+        BusquedaFiltrada.setContactos(contactos);
+        cursor_contactos.next();
 
         Scanner scanner = new Scanner(System.in);
         ver_comandos();
