@@ -58,24 +58,12 @@ public class CircularLinkedListIterator<T> implements Iterator<T> {
         current_node = list.remove_at_node(current_node);
     }
 
-    public void removeConsumed() {
-        current_node = list.remove_at_node(current_node.prev);
-    }
-
-    public void changeConsumedNodeValue(T value) {
-        current_node.prev.value = value;
-    }
-
     public void changeCurrentNodeValue(T value) {
         current_node.value = value;
     }
 
     public boolean hasLooped() {
         return looped;
-    }
-
-    public T getConsumed() {
-        return current_node.prev.value;
     }
 
     public T getCurrent() {

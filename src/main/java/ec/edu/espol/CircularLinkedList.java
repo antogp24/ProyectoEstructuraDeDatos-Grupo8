@@ -126,7 +126,17 @@ public class CircularLinkedList<T> implements Iterable<T>, Serializable {
         length++;
     }
 
-    public void remove(int index) {
+    public void remove(T element) {
+        Node<T> node = head;
+        while (node != null) {
+            if (node.value.equals(element)) break;
+            node = node.next;
+        }
+        if (node == null) return;
+        remove_at_node(node);
+    }
+
+    public void removeAt(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException();
         }

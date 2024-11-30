@@ -16,7 +16,6 @@ public class Main {
         contactos = Contacto.cargarContactos();
         cursor_contactos = contactos.iterator();
         BusquedaFiltrada.setContactos(contactos);
-        cursor_contactos.next();
 
         Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8.name());
         imprimirTablaComandos();
@@ -52,6 +51,7 @@ public class Main {
         new Cmd_Desc_Pair("#eliminar",       "Eliminar un contacto a partir de su número"),
         new Cmd_Desc_Pair("filtrar",         "Buscar los contactos que cumplen un criterio"),
         new Cmd_Desc_Pair("ordenar",         "Ordenar la lista de contactos en base a un criterio"),
+        new Cmd_Desc_Pair("asociado",        "Ver la información de un contacto asociado"),
     };
 
     static void procesarComando(String command, Scanner scanner) {
@@ -95,6 +95,7 @@ public class Main {
 
             case "filtrar": comandoFiltrar(scanner); break;
             case "ordenar": comandoOrdenar(scanner); break;
+            case "asociado": comandoAsociado(scanner, cursor_contactos.getCurrent()); break;
 
             default: {
                 System.out.println("Comando inválido: \"" + comando + '"');
@@ -123,11 +124,16 @@ public class Main {
     }
 
     static void imprimirListaContactos(final boolean detallado) {
+        if (contactos.isEmpty()) {
+            System.out.println("No hay contactos.");
+            System.out.println("    Crea uno usando el comando \"nuevo\".");
+            return;
+        }
         int i = 0;
         CircularLinkedListIterator<Contacto> it = contactos.iterator();
         while (it.hasNext() && !it.hasLooped()) {
             Contacto contacto = it.next();
-            String cursor = (it.getCurrentNode() == cursor_contactos.getCurrentNode()) ? "->" : "  ";
+            String cursor = (contacto == cursor_contactos.getCurrent()) ? "->" : "  ";
             char tipo = (contacto instanceof ContactoPersonal) ? 'P' : 'E';
             System.out.printf("%s [%c] contacto #%d: ", cursor, tipo, i+1);
             if (detallado) {
@@ -139,12 +145,20 @@ public class Main {
         }
     }
 
+    static String wrapInColor(String string, int color) {
+        if (color < 30 || color > 37) {
+            throw new IllegalStateException();
+        }
+        return "\u001B[" + color + "m" + string + "\u001B[0m";
+    }
+
     static int opcionAtributoLista(Scanner scanner, String nombreAtributo) {
         System.out.println("¿Qué deseas hacer en \"" + nombreAtributo + "\"?");
+        System.out.println("    0. " + wrapInColor("Cancelar", 31));
         System.out.println("    1. Añadir uno a la lista");
         System.out.println("    2. Cambiar uno de la lista");
         System.out.println("    3. Borrar uno de la lista");
-        return nextNumero(scanner, "Escoge una opción (número): ", 1, 3);
+        return nextNumero(scanner, "Escoge una opción (número): ", 0, 3);
     }
 
     @FunctionalInterface
@@ -152,37 +166,54 @@ public class Main {
         T next(Scanner scanner);
     }
 
-    private static <T> void cambiarAtributoLista(Scanner scanner, MyList<T> list, int subopcion, Funcion_Scan_Contacto<T> funcion_scan) {
-        switch (subopcion) {
-            case 1 -> { // Añadir
+    private static <T> boolean cambiarAtributoLista(Scanner scanner, MyList<T> list, int subopcion, Funcion_Scan_Contacto<T> funcion_scan) {
+        switch (subopcion)
+        {
+            case 0: System.out.println("Cancelado exitosamente."); return false;
+
+            case 1: { // Añadir
                 System.out.print("Valor: ");
                 list.add(funcion_scan.next(scanner));
-            }
-            case 2 -> { // Cambiar
+            } break;
+
+            case 2: { // Cambiar
                 if (list.isEmpty()) {
                     System.out.println("No hay elementos que cambiar.");
-                    return;
+                    return false;
                 }
+                System.out.println("    0. " + wrapInColor("Cancelar", 31));
                 list.imprimirNumerado("    ");
-                int indice = nextNumero(scanner, "Escoge uno (índice): ", 1, list.size());
+                int indice = nextNumero(scanner, "Escoge uno (índice): ", 0, list.size());
+                if (indice == 0) {
+                    System.out.println("Cancelado exitosamente.");
+                    return false;
+                }
                 System.out.print("Valor: ");
                 list.set(indice-1, funcion_scan.next(scanner));
-            }
-            case 3 -> { // Borrar
+            } break;
+
+            case 3: { // Borrar
                 if (list.isEmpty()) {
                     System.out.println("No hay elementos que borrar.");
-                    return;
+                    return false;
                 }
+                System.out.println("    0. " + wrapInColor("Cancelar", 31));
                 list.imprimirNumerado("    ");
-                int indice = nextNumero(scanner, "Escoge uno (índice): ", 1, list.size());
+                int indice = nextNumero(scanner, "Escoge uno (índice): ", 0, list.size());
+                if (indice == 0) {
+                    System.out.println("Cancelado exitosamente.");
+                    return false;
+                }
                 list.removeAt(indice-1);
-            }
+            } break;
         }
+        return true;
     }
 
-    static void editarContacto(Scanner scanner, Contacto contacto) {
-        final boolean es_personal = (contacto instanceof ContactoPersonal);
-        System.out.println("Escoge que atributo quieres cambiar");
+    static boolean editarContacto(Scanner scanner, Contacto contacto) {
+        final String ultimaOpcion = (contacto instanceof ContactoPersonal) ? "Apellido" : "Sucursales";
+        System.out.println("Escoge que atributo quieres cambiar del contacto " + contacto.nombre);
+        System.out.println("     0. " + wrapInColor("Cancelar", 31));
         System.out.println("     1. Nombre");
         System.out.println("     2. Foto");
         System.out.println("     3. Dirección");
@@ -193,10 +224,15 @@ public class Main {
         System.out.println("     8. Contactos relacionados");
         System.out.println("     9. País");
         System.out.println("    10. Ciudad");
-        System.out.println("    11. " + (es_personal ? "Apellido" : "Sucursales"));
+        System.out.println("    11. " + ultimaOpcion);
 
-        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 1, 10);
+        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 0, 11);
+
         switch (opcion) {
+            case 0 -> {
+                System.out.println("Cancelado exitosamente.");
+                return false;
+            }
             case 1 -> {
                 System.out.print("Nuevo nombre: ");
                 contacto.nombre = scanner.nextLine();
@@ -211,49 +247,54 @@ public class Main {
             }
             case 4 -> {
                 final int subopcion = opcionAtributoLista(scanner, "emails");
-                cambiarAtributoLista(scanner, contacto.emails, subopcion, new Funcion_Scan_Contacto<String>() {
+                final boolean ok = cambiarAtributoLista(scanner, contacto.emails, subopcion, new Funcion_Scan_Contacto<String>() {
                     @Override
                     public String next(Scanner scanner) {
                         return scanner.nextLine();
                     }
                 });
+                if (!ok) return false;
             }
             case 5 -> {
                 final int subopcion = opcionAtributoLista(scanner, "números de teléfono");
-                cambiarAtributoLista(scanner, contacto.numeros_de_telefono, subopcion, new Funcion_Scan_Contacto<String>() {
+                final boolean ok = cambiarAtributoLista(scanner, contacto.numeros_de_telefono, subopcion, new Funcion_Scan_Contacto<String>() {
                     @Override
                     public String next(Scanner scanner) {
                         return scanner.nextLine();
                     }
                 });
+                if (!ok) return false;
             }
             case 6 -> {
                 final int subopcion = opcionAtributoLista(scanner, "identificadores de redes sociales");
-                cambiarAtributoLista(scanner, contacto.identificadores_de_redes_sociales, subopcion, new Funcion_Scan_Contacto<String>() {
+                final boolean ok = cambiarAtributoLista(scanner, contacto.identificadores_de_redes_sociales, subopcion, new Funcion_Scan_Contacto<String>() {
                     @Override
                     public String next(Scanner scanner) {
                         return scanner.nextLine();
                     }
                 });
+                if (!ok) return false;
             }
             case 7 -> {
                 final int subopcion = opcionAtributoLista(scanner, "fechas de interes");
-                cambiarAtributoLista(scanner, contacto.fechas_de_interes, subopcion, new Funcion_Scan_Contacto<FechaDeInteres>() {
+                final boolean ok = cambiarAtributoLista(scanner, contacto.fechas_de_interes, subopcion, new Funcion_Scan_Contacto<FechaDeInteres>() {
                     @Override
                     public FechaDeInteres next(Scanner scanner) {
                         System.out.println(); // Salto de línea antes del primer prompt.
                         return FechaDeInteres.next(scanner, "    ");
                     }
                 });
+                if (!ok) return false;
             }
             case 8 -> {
                 final int subopcion = opcionAtributoLista(scanner, "contactos relacionados");
-                cambiarAtributoLista(scanner, contacto.contactos_relacionados, subopcion, new Funcion_Scan_Contacto<String>() {
+                final boolean ok = cambiarAtributoLista(scanner, contacto.contactos_relacionados, subopcion, new Funcion_Scan_Contacto<String>() {
                     @Override
                     public String next(Scanner scanner) {
                         return scanner.nextLine();
                     }
                 });
+                if (!ok) return false;
             }
             case 9 -> {
                 System.out.print("País: ");
@@ -270,15 +311,17 @@ public class Main {
                 }
                 else if (contacto instanceof ContactoEmpresa contacto_empresa) {
                     final int subopcion = opcionAtributoLista(scanner, "sucursales");
-                    cambiarAtributoLista(scanner, contacto_empresa.sucursales, subopcion, new Funcion_Scan_Contacto<String>() {
+                    final boolean ok = cambiarAtributoLista(scanner, contacto_empresa.sucursales, subopcion, new Funcion_Scan_Contacto<String>() {
                         @Override
                         public String next(Scanner scanner) {
                             return scanner.nextLine();
                         }
                     });
+                    if (!ok) return false;
                 }
             }
         }
+        return true;
     }
 
     static void editar_contacto_del_cursor(Scanner scanner) {
@@ -286,7 +329,8 @@ public class Main {
             System.out.println("No hay contactos en la lista de contactos.");
             return;
         }
-        editarContacto(scanner, cursor_contactos.getCurrent());
+        final boolean ok = editarContacto(scanner, cursor_contactos.getCurrent());
+        if (!ok) return;
         System.out.println("Contacto editado exitosamente");
         if (AUTOGUARDADO) guardarProgreso();
     }
@@ -303,7 +347,8 @@ public class Main {
             // Buscar el que se va a editar
             for (String telefono: actual.numeros_de_telefono) {
                 if (telefono_a_editar.equals(telefono)) {
-                    editarContacto(scanner, it.getConsumed());
+                    final boolean ok = editarContacto(scanner, actual);
+                    if (!ok) return;
                     System.out.println("Contacto editado exitosamente");
                     if (AUTOGUARDADO) guardarProgreso();
                     return;
@@ -331,13 +376,13 @@ public class Main {
         // Recorrer todos los contactos
         CircularLinkedListIterator<Contacto> it = contactos.iterator();
         while (it.hasNext() && !it.hasLooped()) {
-            Contacto actual = it.next();
+            Contacto contacto = it.next();
 
             // Buscar el que se va a editar
-            for (String telefono: actual.numeros_de_telefono) {
+            for (String telefono: contacto.numeros_de_telefono) {
                 if (telefono_a_eliminar.equals(telefono)) {
-                    it.removeConsumed();
-                    System.out.println("Contacto eliminado exitosamente");
+                    System.out.printf("Contacto de \"%s\" eliminado exitosamente", contacto.nombre);
+                    contactos.remove(contacto);
                     if (AUTOGUARDADO) guardarProgreso();
                     cursor_contactos.reset();
                     return;
@@ -349,13 +394,14 @@ public class Main {
 
     static void comandoFiltrar(Scanner scanner) {
         System.out.println("Criterios de busqueda:");
+        System.out.println("    0. " + wrapInColor("Cancelar", 31));
         System.out.println("    1. Por mes de nacimiento.");
         System.out.println("    2. Por país.");
         System.out.println("    3. Por país y ciudad.");
         System.out.println("    4. Todos los contactos personales.");
         System.out.println("    5. Todos los contactos de empresa.");
 
-        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 1, 5);
+        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 0, 5);
 
         MyList<Contacto> filtrado = switch (opcion) {
             case 1 -> {
@@ -382,8 +428,10 @@ public class Main {
 
             default -> null;
         };
-
-        if (filtrado == null || filtrado.isEmpty()) {
+        if (filtrado == null) {
+            System.out.println("Cancelado exitosamente.");
+            return;
+        } else if (filtrado.isEmpty()) {
             System.out.println("No hubieron resultados con este criterio.");
             return;
         }
@@ -394,13 +442,14 @@ public class Main {
 
     static void comandoOrdenar(Scanner scanner) {
         System.out.println("Criterios de ordenamiento:");
+        System.out.println("    0. " + wrapInColor("Cancelar", 31));
         System.out.println("    1. Por nombre completo.");
         System.out.println("    2. Por cantidad de telefonos.");
         System.out.println("    3. Por identificadores de redes sociales.");
         System.out.println("    4. Por cumpleaños.");
         System.out.println("    5. Por tipo de contacto.");
 
-        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 1, 5);
+        final int opcion = nextNumero(scanner, "Escoge uno (número): ", 0, 5);
 
         Comparator<Contacto> comparador = switch (opcion) {
             case 1 -> Comparadores.porNombreCompleto;
@@ -412,13 +461,38 @@ public class Main {
         };
 
         if (comparador == null) {
-            throw new IllegalStateException("No se esperaba que el comparador fuera null. Revisa si cubriste todos los casos.");
+            System.out.println("Cancelado exitosamente");
+            return;
         }
 
         contactos.sort(comparador);
         cursor_contactos.reset();
-        cursor_contactos.next();
         imprimirListaContactos(false);
+    }
+
+    static void comandoAsociado(Scanner scanner, Contacto contacto) {
+        System.out.println(contacto);
+        if (contacto.contactos_relacionados.isEmpty()) {
+            System.out.printf("El contacto de \"%s\" no tiene contactos relacionados\n", contacto.nombre);
+            return;
+        }
+        System.out.println("¿Qué contacto asociado deseas ver?");
+        System.out.println("    0. " + wrapInColor("Cancelar", 31));
+        contacto.contactos_relacionados.imprimirNumerado("    ");
+
+        final int indice = nextNumero(scanner, "Escoge una opción (índice): ", 0, contacto.contactos_relacionados.size());
+
+        if (indice == 0) {
+            System.out.println("Cancelado exitosamente.");
+            return;
+        }
+        final String numeroTelefono = contacto.contactos_relacionados.get(indice-1);
+        final Contacto relacionado = contacto.getRelacionado(contactos, numeroTelefono);
+        if (relacionado == null) {
+            System.out.println("El número de teléfono de este contacto relacionado no se encontró.");
+            return;
+        }
+        System.out.println(relacionado.toString());
     }
 
     public static int nextNumero(Scanner scanner, String prompt, int a, int b) {

@@ -12,8 +12,8 @@ public class MyList<T> implements Serializable, Iterable<T> {
     
     public MyList(int capacity, boolean fill_size) {
         this.length = fill_size ? capacity : 0;
-        this.capacity = capacity;
-        this.items = new Object[capacity];
+        this.capacity = (capacity > 0) ? capacity : DEFAULT_CAPACITY;
+        this.items = new Object[this.capacity];
     }
     
     public MyList(int capacity) {
@@ -42,6 +42,11 @@ public class MyList<T> implements Serializable, Iterable<T> {
     }
 
     protected void crecerArreglo() {
+        if (items.length == 0) {
+            capacity = DEFAULT_CAPACITY;
+            items = new Object[capacity];
+            return;
+        }
         Object[] old_items = items;
         int old_capacity = capacity;
 
@@ -63,12 +68,12 @@ public class MyList<T> implements Serializable, Iterable<T> {
     }
 
     public void add(T value) {
-        if (length + 1 > capacity) crecerArreglo();
+        if (items.length == 0 || length + 1 > capacity) crecerArreglo();
         items[length++] = value;
     }
 
     public void add(int index, T value) {
-        if (length + 1 > capacity) crecerArreglo();
+        if (items.length == 0 || length + 1 > capacity) crecerArreglo();
 
         for (int i = length; i > index; i--) {
             items[i] = items[i-1];

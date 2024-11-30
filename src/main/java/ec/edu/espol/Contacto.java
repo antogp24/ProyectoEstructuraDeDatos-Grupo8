@@ -177,6 +177,20 @@ public class Contacto implements Serializable{
         return contactos;
     }
 
+    public Contacto getRelacionado(final CircularLinkedList<Contacto> contactos, String numeroTelefono) {
+        CircularLinkedListIterator<Contacto> it = new CircularLinkedListIterator<>(contactos);
+        while (it.hasNext() && !it.hasLooped()) {
+            Contacto contacto = it.next();
+            if (contacto == this) continue;
+            for (String num: contacto.numeros_de_telefono) {
+                if (num.trim().equals(numeroTelefono.trim())) {
+                    return contacto;
+                }
+            }
+        }
+        return null;
+    }
+
     public LocalDate obtenerFechaNacimiento() {
         for (FechaDeInteres fecha: fechas_de_interes) {
             if (fecha != null && "Nacimiento".equalsIgnoreCase(fecha.getNombre())) {
