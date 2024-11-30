@@ -95,6 +95,7 @@ public class Main {
 
             case "filtrar": comandoFiltrar(scanner); break;
             case "ordenar": comandoOrdenar(scanner); break;
+            case "asociado": comandoAsociado(scanner, cursor_contactos.getCurrent()); break;
 
             default: {
                 System.out.println("Comando inválido: \"" + comando + '"');
@@ -392,6 +393,10 @@ public class Main {
     }
 
     static void comandoFiltrar(Scanner scanner) {
+        if (contactos.isEmpty()) {
+            System.out.println("No hay contactos que buscar.");
+            return;
+        }
         System.out.println("Criterios de busqueda:");
         System.out.println("    0. " + wrapInColor("Cancelar", 31));
         System.out.println("    1. Por mes de nacimiento.");
@@ -440,6 +445,10 @@ public class Main {
     }
 
     static void comandoOrdenar(Scanner scanner) {
+        if (contactos.isEmpty()) {
+            System.out.println("No hay contactos que ordenar.");
+            return;
+        }
         System.out.println("Criterios de ordenamiento:");
         System.out.println("    0. " + wrapInColor("Cancelar", 31));
         System.out.println("    1. Por nombre completo.");
@@ -470,7 +479,10 @@ public class Main {
     }
 
     static void comandoAsociado(Scanner scanner, Contacto contacto) {
-        System.out.println(contacto);
+        if (contacto == null) {
+            System.out.println("La lista de contactos esta vacía.");
+            return;
+        }
         if (contacto.contactos_relacionados.isEmpty()) {
             System.out.printf("El contacto de \"%s\" no tiene contactos relacionados\n", contacto.nombre);
             return;

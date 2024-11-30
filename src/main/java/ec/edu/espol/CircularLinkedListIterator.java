@@ -59,6 +59,7 @@ public class CircularLinkedListIterator<T> implements Iterator<T> {
     }
 
     public void changeCurrentNodeValue(T value) {
+        if (current_node == null) return;
         current_node.value = value;
     }
 
@@ -67,6 +68,7 @@ public class CircularLinkedListIterator<T> implements Iterator<T> {
     }
 
     public T getCurrent() {
+        if (current_node == null) return null;
         return current_node.value;
     }
 
