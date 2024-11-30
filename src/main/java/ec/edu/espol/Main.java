@@ -2,7 +2,6 @@ package ec.edu.espol;
 
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 
@@ -57,11 +56,16 @@ public class Main {
 
     static void procesarComando(String command, Scanner scanner) {
         String[] parts = command.split(" ");
-        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
 
-        switch (parts[0]) {
-            case "ayuda": comandoAyuda(args); break;
-            case "cerrar": comandoCerrar(args); break;
+        if (parts.length != 1) {
+            System.out.println("Se esperaba un comando con ningún argumento.");
+            return;
+        }
+        final String comando = parts[0].trim();
+
+        switch (comando) {
+            case "ayuda": imprimirTablaComandos(); break;
+            case "cerrar": { running_app = false; } break;
 
             case "lista": imprimirListaContactos(false); break;
             case "lista_detallada": imprimirListaContactos(true); break;
@@ -93,28 +97,19 @@ public class Main {
             case "ordenar": comandoOrdenar(scanner); break;
 
             default: {
-                System.out.println("Comando inválido: \"" + parts[0]+ '"');
+                System.out.println("Comando inválido: \"" + comando + '"');
                 System.out.println("    Escribe \"ayuda\" para ver los comandos válidos");
             }
         }
     }
 
-    static void comandoCerrar(String[] args) {
+    static boolean verificarArgsVacio(String[] args)  {
         if (args.length != 0) {
             System.out.println("Se esperaba 0 argumentos para este comando.");
             System.out.println("Intentalo de nuevo.");
-            return;
+            return false;
         }
-        running_app = false;
-    }
-
-    static void comandoAyuda(String[] args) {
-        if (args.length != 0) {
-            System.out.println("Se esperaba 0 argumentos para este comando.");
-            System.out.println("Intentalo de nuevo.");
-            return;
-        }
-        imprimirTablaComandos();
+        return true;
     }
 
     static void imprimirTablaComandos() {
