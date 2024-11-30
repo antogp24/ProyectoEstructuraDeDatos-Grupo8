@@ -53,6 +53,15 @@ public class MyList<T> implements Serializable, Iterable<T> {
         }
     }
 
+    public void removeAt(int index) {
+        if (isEmpty()) return;
+        if (index < 0 || index >= length) return;
+        for (int i = index; i < length - 1; i++) {
+            items[i] = items[i+1];
+        }
+        length--;
+    }
+
     public void add(T value) {
         if (length + 1 > capacity) crecerArreglo();
         items[length++] = value;
@@ -74,6 +83,13 @@ public class MyList<T> implements Serializable, Iterable<T> {
             if (items[i] == item) return i;
         }
         return -1;
+    }
+
+    public void imprimirNumerado(String indentacion) {
+        for (int i = 0; i < length; i++) {
+            System.out.printf("%s%d. ", indentacion, i+1);
+            System.out.println(items[i]);
+        }
     }
 
     /* */

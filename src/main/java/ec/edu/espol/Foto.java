@@ -26,7 +26,6 @@ public class Foto implements Serializable {
 
     @Override
     public String toString() {
-        return "Path = " + this.path + '\t' 
-                ;
+        return "Foto:\"" + this.path + '"';
     }
 }

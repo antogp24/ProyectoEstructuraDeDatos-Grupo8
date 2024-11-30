@@ -74,6 +74,14 @@ public class CircularLinkedListIterator<T> implements Iterator<T> {
         return looped;
     }
 
+    public T getConsumed() {
+        return current_node.prev.value;
+    }
+
+    public T getCurrent() {
+        return current_node.value;
+    }
+
     public CircularLinkedList.Node<T> getCurrentNode() {
         return current_node;
     }

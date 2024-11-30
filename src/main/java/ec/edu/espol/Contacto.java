@@ -135,6 +135,7 @@ public class Contacto implements Serializable{
     public String toString() {
         return "    - Nombre: " + nombre + '\n' +
                "    - Foto: " + foto.path + '\n' +
+               "    - Dirección: " + direccion + '\n' +
                "    - Emails: " + emails+ '\n' +
                "    - Telefonos: " + numeros_de_telefono+ '\n' +
                "    - Identificadores: " + identificadores_de_redes_sociales+ '\n' +

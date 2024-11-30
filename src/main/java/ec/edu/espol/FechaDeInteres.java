@@ -51,8 +51,6 @@ public class FechaDeInteres implements Serializable {
 
     @Override
     public String toString() {
-        return  " " + this.nombre + " : "  +
-                this.getFecha()  
-                ;
+        return  "\"" + this.nombre + "\":"  + this.getFecha();
     }
 }
