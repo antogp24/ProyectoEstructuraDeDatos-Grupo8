@@ -52,7 +52,12 @@ public class Main {
         new Cmd_Desc_Pair("#eliminar",       "Eliminar un contacto a partir de su número"),
         new Cmd_Desc_Pair("filtrar",         "Buscar los contactos que cumplen un criterio"),
         new Cmd_Desc_Pair("ordenar",         "Ordenar la lista de contactos en base a un criterio"),
+        new Cmd_Desc_Pair("ver",             "Visualizar contacto en curso"),
     };
+
+    static void verContactoEnCurso(){
+        System.out.println(cursor_contactos.getConsumed());
+    }
 
     static void procesarComando(String command, Scanner scanner) {
         String[] parts = command.split(" ");
@@ -95,6 +100,7 @@ public class Main {
 
             case "filtrar": comandoFiltrar(scanner); break;
             case "ordenar": comandoOrdenar(scanner); break;
+            case "ver": verContactoEnCurso(); break;
 
             default: {
                 System.out.println("Comando inválido: \"" + comando + '"');
