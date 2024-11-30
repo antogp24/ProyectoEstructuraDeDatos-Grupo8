@@ -95,7 +95,6 @@ public class Main {
 
             case "filtrar": comandoFiltrar(scanner); break;
             case "ordenar": comandoOrdenar(scanner); break;
-            case "asociado": comandoAsociado(scanner, cursor_contactos.getCurrent()); break;
 
             default: {
                 System.out.println("Comando inválido: \"" + comando + '"');
